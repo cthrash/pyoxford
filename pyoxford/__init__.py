@@ -2,10 +2,10 @@ def speech(path_or_client_id="", client_secret=""):
     from pyoxford.speech_api import Speech
     api = None
     if path_or_client_id and client_secret:
-        api = Speech(path_or_client_id, client_secret)
+        api = Speech(client_secret)
     else:
         key = _read_key(path_or_client_id, "speech")
-        api = Speech(key.primary, key.secondary)
+        api = Speech(key.primary)
 
     return api
 

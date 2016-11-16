@@ -13,29 +13,22 @@ class Speech():
     USER_AGENT = "pyoxford.SpeechAPI"
     UNIQUE_ID = str(uuid.uuid4()).replace("-", "")
 
-    def __init__(self, client_id, client_secret):
+    def __init__(self, client_secret):
         self.instance_id = self.__generate_id()
         self.__token = ""
-        self.authorize(client_id, client_secret)
+        self.authorize(client_secret)
 
-    def authorize(self, client_id, client_secret):
-        url = "https://oxford-speech.cloudapp.net//token/issueToken"
+    def authorize(self, client_secret):
+        url = "https://api.cognitive.microsoft.com/sts/v1.0/issueToken"
 
         headers = {
+	    "Ocp-Apim-Subscription-Key": client_secret,
             "Content-type": "application/x-www-form-urlencoded"
         }
 
-        params = urlencode(
-            {"grant_type": "client_credentials",
-             "client_id": client_id,
-             "client_secret": client_secret,
-             "scope": self.HOST}
-        )
-
-        response = requests.post(url, data=params, headers=headers)
+        response = requests.post(url, headers=headers)
         if response.ok:
-            _body = response.json()
-            self.__token = _body["access_token"]
+            self.__token = response.text
         else:
             response.raise_for_status()
 
