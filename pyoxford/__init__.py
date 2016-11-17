@@ -1,3 +1,5 @@
+from pyoxford.token import _Token
+
 def speech(path_or_client_id="", client_secret=""):
     from pyoxford.speech_api import Speech
     api = None
@@ -25,11 +27,13 @@ def vision(path_or_key=""):
 def translator(path_or_client_id="", client_secret=""):
     from pyoxford.translator_api import Translator
     api = None
-    if path_or_client_id and client_secret:
-        api = Translator(path_or_client_id, client_secret)
-    else:
+    if path_or_client_id.find(".yaml") > 0:
         key = _read_key(path_or_client_id, "translator")
         api = Translator(key.primary, key.secondary)
+    elif path_or_client_id and client_secret:
+        api = Translator(path_or_client_id, client_secret)
+    else:
+        api = Translator("unused", path_or_client_id, True)
 
     return api
 

@@ -1,4 +1,5 @@
 from xml.etree import ElementTree
+from pyoxford.token import _Token
 import requests
 
 try:
@@ -7,40 +8,18 @@ except ImportError:
     from urllib import urlencode
 
 
-class Translator(object):
-    AUTH_URL = "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
+class Translator(_Token):
     API_ROOT = "http://api.microsofttranslator.com/v2/Http.svc"
-    TRANSLATE_URL = "http://api.microsofttranslator.com/v2/Http.svc/Translates"
 
-    def __init__(self, client_id, client_secret):
-        self.__token = ""
-        self.authorize(client_id, client_secret)
-
-    def authorize(self, client_id, client_secret):
-        headers = {
-            "Content-type": "application/x-www-form-urlencoded"
-        }
-
-        params = urlencode({
-            "grant_type": "client_credentials",
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "scope": "http://api.microsofttranslator.com"
-        })
-
-        resp = requests.post(self.AUTH_URL, data=params, headers=headers)
-        if resp.ok:
-            _body = resp.json()
-            self.__token = _body["access_token"]
-        else:
-            resp.raise_for_status()
+    def __init__(self, client_id, client_secret, new_auth=False):
+        _Token.__init__(self, client_secret, client_id, new_auth, "http://api.microsofttranslator.com")
 
     def detect(self, text):
         params = {
             "text": text
         }
         url = self.API_ROOT + "/Detect?" + urlencode(params)
-        resp = requests.get(url, headers=self.__make_header())
+        resp = requests.get(url, headers=self._make_header())
         result = {}
         if resp.ok:
             root = ElementTree.fromstring(resp.content)
@@ -61,7 +40,7 @@ class Translator(object):
             params["from"] = lang_from
 
         url = self.API_ROOT + "/Translate?" + urlencode(params)
-        resp = requests.get(url, headers=self.__make_header())
+        resp = requests.get(url, headers=self._make_header())
         result = {}
         if resp.ok:
             root = ElementTree.fromstring(resp.content)
@@ -69,8 +48,3 @@ class Translator(object):
         else:
             resp.raise_for_status()
         return result
-
-    def __make_header(self):
-        return {
-            "Authorization": "Bearer {0}".format(self.__token)
-        }

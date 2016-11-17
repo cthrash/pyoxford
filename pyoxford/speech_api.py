@@ -1,6 +1,7 @@
 import uuid
 import requests
 import platform
+from pyoxford.token import _Token
 
 try:
     from urllib.parse import urlencode 
@@ -8,29 +9,14 @@ except ImportError:
     from urllib import urlencode
 
 
-class Speech():
+class Speech(_Token):
     HOST = "https://speech.platform.bing.com"
     USER_AGENT = "pyoxford.SpeechAPI"
     UNIQUE_ID = str(uuid.uuid4()).replace("-", "")
 
     def __init__(self, client_secret):
+        _Token.__init__(self, client_secret=client_secret, new_auth=True)
         self.instance_id = self.__generate_id()
-        self.__token = ""
-        self.authorize(client_secret)
-
-    def authorize(self, client_secret):
-        url = "https://api.cognitive.microsoft.com/sts/v1.0/issueToken"
-
-        headers = {
-	    "Ocp-Apim-Subscription-Key": client_secret,
-            "Content-type": "application/x-www-form-urlencoded"
-        }
-
-        response = requests.post(url, headers=headers)
-        if response.ok:
-            self.__token = response.text
-        else:
-            response.raise_for_status()
 
     def text_to_speech(self, text, lang="en-US", female=True):
         template = """
@@ -45,7 +31,7 @@ class Speech():
         headers = {
             "Content-type": "application/ssml+xml",
             "X-Microsoft-OutputFormat": "riff-16khz-16bit-mono-pcm",
-            "Authorization": "Bearer " + self.__token,
+            "Authorization": "Bearer " + self._token,
             "X-Search-AppId": self.UNIQUE_ID,
             "X-Search-ClientID": self.instance_id,
             "User-Agent": self.USER_AGENT
@@ -79,7 +65,7 @@ class Speech():
 
         url = self.HOST + "/recognize/query?" + urlencode(params)
         headers = {"Content-type": "audio/wav; samplerate={0}".format(samplerate),
-                   "Authorization": "Bearer " + self.__token,
+                   "Authorization": "Bearer " + self._token,
                    "X-Search-AppId": self.UNIQUE_ID,
                    "X-Search-ClientID": self.instance_id,
                    "User-Agent": self.USER_AGENT}
