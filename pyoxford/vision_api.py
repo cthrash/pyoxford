@@ -1,6 +1,6 @@
+from collections import namedtuple
 from enum import Enum
 import json
-from collections import namedtuple
 import requests
 
 try:
@@ -169,9 +169,9 @@ class OCRResult():
         self.language = result["language"]
         self.text_angle = float(result["textAngle"])
         self.orientation = result["orientation"]
-        self.regions = [self._load_region(r) for r in result["regions"]]
+        self.regions = [self.__load_region(r) for r in result["regions"]]
 
-    def _load_region(self, region):
+    def __load_region(self, region):
         Region = namedtuple("Region", ["position", "lines"])
         Line = namedtuple("Line", ["position", "words"])
         Word = namedtuple("Word", ["position", "text"])

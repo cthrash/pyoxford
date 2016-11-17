@@ -41,12 +41,12 @@ def translator(path_or_client_id="", client_secret=""):
 def _read_key(path, service_name):
     import yaml
     from collections import namedtuple
-    ApiKey = namedtuple("ApiKey", ["primary", "secondary"])
+    ApiKey = namedtuple("apiKey", ["primary", "secondary"])
     key = ApiKey("", "")
-    with open(path, "rb") as f:
-        settings = yaml.load(f)
-        p = settings[service_name]["primary"]
-        s = settings[service_name]["secondary"]
-        key = ApiKey(p, s)
+    with open(path, "rb") as config:
+        settings = yaml.load(config)
+        key1 = settings[service_name]["primary"]
+        key2 = settings[service_name]["secondary"]
+        key = ApiKey(key1, key2)
 
     return key

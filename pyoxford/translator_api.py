@@ -3,7 +3,7 @@ from pyoxford.token import _Token
 import requests
 
 try:
-    from urllib.parse import urlencode 
+    from urllib.parse import urlencode
 except ImportError:
     from urllib import urlencode
 
@@ -12,7 +12,8 @@ class Translator(_Token):
     API_ROOT = "http://api.microsofttranslator.com/v2/Http.svc"
 
     def __init__(self, client_id, client_secret, new_auth=False):
-        _Token.__init__(self, client_secret, client_id, new_auth, "http://api.microsofttranslator.com")
+        _Token.__init__(self, client_secret, client_id, new_auth,
+                        "http://api.microsofttranslator.com")
 
     def detect(self, text):
         params = {

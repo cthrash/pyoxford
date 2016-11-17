@@ -1,10 +1,10 @@
 import uuid
-import requests
 import platform
+import requests
 from pyoxford.token import _Token
 
 try:
-    from urllib.parse import urlencode 
+    from urllib.parse import urlencode
 except ImportError:
     from urllib import urlencode
 
