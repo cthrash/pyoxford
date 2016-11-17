@@ -1,7 +1,7 @@
 import uuid
 import platform
 import requests
-from pyoxford.token import _Token
+from pyoxford.token import Token
 
 try:
     from urllib.parse import urlencode
@@ -9,13 +9,13 @@ except ImportError:
     from urllib import urlencode
 
 
-class Speech(_Token):
+class Speech:
     HOST = "https://speech.platform.bing.com"
     USER_AGENT = "pyoxford.SpeechAPI"
     UNIQUE_ID = str(uuid.uuid4()).replace("-", "")
 
     def __init__(self, client_secret):
-        _Token.__init__(self, client_secret=client_secret, new_auth=True)
+        self.__token = Token(client_secret=client_secret, new_auth=True)
         self.instance_id = self.__generate_id()
 
     def text_to_speech(self, text, lang="en-US", female=True):
@@ -31,7 +31,7 @@ class Speech(_Token):
         headers = {
             "Content-type": "application/ssml+xml",
             "X-Microsoft-OutputFormat": "riff-16khz-16bit-mono-pcm",
-            "Authorization": "Bearer " + self._token,
+            "Authorization": self.__token.authorization(),
             "X-Search-AppId": self.UNIQUE_ID,
             "X-Search-ClientID": self.instance_id,
             "User-Agent": self.USER_AGENT
@@ -65,7 +65,7 @@ class Speech(_Token):
 
         url = self.HOST + "/recognize/query?" + urlencode(params)
         headers = {"Content-type": "audio/wav; samplerate={0}".format(samplerate),
-                   "Authorization": "Bearer " + self._token,
+                   "Authorization": self.__token.authorization(),
                    "X-Search-AppId": self.UNIQUE_ID,
                    "X-Search-ClientID": self.instance_id,
                    "User-Agent": self.USER_AGENT}

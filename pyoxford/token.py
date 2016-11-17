@@ -6,12 +6,12 @@ except ImportError:
     from urllib import urlencode
 
 
-class _Token(object):
+class Token(object):
     OLD_AUTH_URL = "https://datamarket.accesscontrol.windows.net/v2/OAuth2-13"
     NEW_AUTH_URL = "https://api.cognitive.microsoft.com/sts/v1.0/issueToken"
 
     def __init__(self, client_secret, client_id="", new_auth=False, scope=""):
-        self._token = ""
+        self.__token = ""
         if new_auth:
             self.__authorize_new(client_secret)
         else:
@@ -24,7 +24,7 @@ class _Token(object):
 
         resp = requests.post(self.NEW_AUTH_URL, headers=headers)
         if resp.ok:
-            self._token = resp.text
+            self.__token = resp.text
         else:
             resp.raise_for_status()
 
@@ -44,7 +44,10 @@ class _Token(object):
         if resp.ok:
             _body = resp.json()
 
-    def _make_header(self):
+    def authorization(self):
+        return "Bearer {0}".format(self.__token)
+
+    def make_header(self):
         return {
-            "Authorization": "Bearer {0}".format(self._token)
+            "Authorization": self.authorization()
         }

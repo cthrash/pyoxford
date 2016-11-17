@@ -1,4 +1,4 @@
-from pyoxford.token import _Token
+from pyoxford.token import Token
 
 def speech(path_or_client_id="", client_secret=""):
     from pyoxford.speech_api import Speech

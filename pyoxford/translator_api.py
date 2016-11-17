@@ -1,5 +1,5 @@
 from xml.etree import ElementTree
-from pyoxford.token import _Token
+from pyoxford.token import Token
 import requests
 
 try:
@@ -8,12 +8,11 @@ except ImportError:
     from urllib import urlencode
 
 
-class Translator(_Token):
+class Translator():
     API_ROOT = "http://api.microsofttranslator.com/v2/Http.svc"
 
     def __init__(self, client_id, client_secret, new_auth=False):
-        _Token.__init__(self, client_secret, client_id, new_auth,
-                        "http://api.microsofttranslator.com")
+        self.__token = Token(client_secret, client_id, new_auth, "http://api.microsofttranslator.com")
 
     def detect(self, text):
         params = {
@@ -41,7 +40,7 @@ class Translator(_Token):
             params["from"] = lang_from
 
         url = self.API_ROOT + "/Translate?" + urlencode(params)
-        resp = requests.get(url, headers=self._make_header())
+        resp = requests.get(url, headers=self.__token.make_header())
         result = {}
         if resp.ok:
             root = ElementTree.fromstring(resp.content)
